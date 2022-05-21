@@ -1,17 +1,8 @@
-package ccats
+package withcats
 
 import cats.effect.{IO, IOApp}
 import cats.free.Free
 import cats.~>
-import console.{Console, PrintLine, ReadLine}
-
-object Console {
-  type Dsl[A] = Free[Console, A]
-
-  def readLine: Dsl[String] = Free.liftF(ReadLine)
-
-  def printLine(line: String): Dsl[Unit] = Free.liftF(PrintLine(line))
-}
 
 object Test extends IOApp.Simple {
 
