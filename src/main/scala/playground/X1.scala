@@ -1,13 +1,18 @@
 package playground
 
-import cats.{Id, Monad, Monoid}
-import cats.effect.IO
-import cats.effect.unsafe.implicits.global
+import cats.{Id, Monoid}
 import console.{Console, PrintLine, ReadLine}
 import playground.FreeMonoid.{Combine, Identity}
+import playground.IO.IO
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+
+trait Monad[F[_]] {
+  def pure[A](x: A): F[A]
+
+  def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
+}
 
 sealed trait Free[F[_], A] {
 
@@ -17,10 +22,10 @@ sealed trait Free[F[_], A] {
 
   def flatMap[B](f: A => Free[F, B]): Free[F, B] = Bind(this, f)
 
-  def foldMap[G[_] : Monad](nt: F ~> G): G[A] = this match {
-    case Pure(a)  => Monad[G].pure(a)
+  def foldMap[G[_]](nt: F ~> G)(implicit M: Monad[G]): G[A] = this match {
+    case Pure(a)  => M.pure(a)
     case Suspend(fa) => nt(fa)
-    case Bind(target, f) => Monad[G].flatMap(target.foldMap(nt)) { e => f(e).foldMap(nt)}
+    case Bind(target, f) => M.flatMap(target.foldMap(nt)) { e => f(e).foldMap(nt)}
   }
 }
 
@@ -39,6 +44,26 @@ object Free {
 
 trait ~>[F[_], G[_]] {
   def apply[A](fa: F[A]): G[A]
+}
+
+object IO {
+  type Thunk[A] = () => A
+  type IO[A] = Free[Thunk, A]
+
+  val identity = new (Thunk ~> Thunk) {
+    def apply[A](t: Thunk[A]): Thunk[A] = t
+  }
+
+  implicit val monadIo: Monad[Thunk] = new Monad[Thunk] {
+    override def pure[A](x: A): Thunk[A] = () => x
+
+    override def flatMap[A, B](fa: Thunk[A])(f: A => Thunk[B]): Thunk[B] = f.apply(fa())
+  }
+
+  def apply[A](body: => A): IO[A] = Free.liftM(() => body)
+
+  def run[A](io: IO[A]): A = io.foldMap(identity).apply()
+
 }
 
 object Console {
@@ -78,10 +103,16 @@ object MonadExample extends App {
 
   println(program)
 
+  implicit val monadIo: Monad[IO] = new Monad[IO] {
+    override def pure[A](x: A): IO[A] = IO(x)
+
+    override def flatMap[A, B](fa: IO[A])(f: A => IO[B]): IO[B] = fa.flatMap(f)
+  }
+
   val stack = mutable.Stack.empty[String]
   val list = ListBuffer.empty[String]
   val interpreterTest = interpreter2(stack, list)
-  program.foldMap(interpreter).unsafeRunSync()
+  IO.run(program.foldMap(interpreter))
 
   println(stack)
   println(list)
