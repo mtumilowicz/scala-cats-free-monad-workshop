@@ -1,4 +1,4 @@
-package vanilla
+package vanilla.monoid
 
 import vanilla.implicits._
 

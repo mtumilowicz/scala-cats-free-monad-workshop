@@ -1,4 +1,6 @@
-package vanilla
+package vanilla.monad
+
+import vanilla.Console
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer

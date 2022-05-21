@@ -1,8 +1,8 @@
-package vanilla
+package vanilla.monoid
+
+import vanilla.monoid.FreeMonoid._
 
 sealed trait FreeMonoid[+A] { self =>
-
-  import vanilla.FreeMonoid._
 
   def ++[A1 >: A](that: FreeMonoid[A1]): FreeMonoid[A1] =
     (self, that) match {

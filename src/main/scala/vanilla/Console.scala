@@ -1,5 +1,7 @@
 package vanilla
 
+import vanilla.monad.Free
+
 sealed trait Console[A]
 
 case object ReadLine extends Console[String]

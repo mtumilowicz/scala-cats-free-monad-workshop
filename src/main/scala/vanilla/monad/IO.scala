@@ -1,7 +1,8 @@
-package vanilla
+package vanilla.monad
 
 import cats.Id
 import vanilla.NaturalTransformation.~>
+import vanilla.{Console, PrintLine, ReadLine}
 import vanilla.implicits._
 
 import scala.collection.mutable
@@ -21,8 +22,12 @@ object IO {
 
   val ioInterpreter: Console ~> IO = new (Console ~> IO) {
     override def apply[A](fa: Console[A]): IO[A] = fa match {
-      case ReadLine => IO { scala.io.StdIn.readLine }
-      case PrintLine(line) => IO { println(line) }
+      case ReadLine => IO {
+        scala.io.StdIn.readLine
+      }
+      case PrintLine(line) => IO {
+        println(line)
+      }
     }
   }
 

@@ -1,10 +1,9 @@
-package vanilla
+package vanilla.monad
 
 import vanilla.NaturalTransformation.~>
+import vanilla.monad.Free._
 
 sealed trait Free[F[_], A] {
-
-  import vanilla.Free._
 
   def map[B](f: A => B): Free[F, B] = flatMap(a => Free.pure(f(a)))
 

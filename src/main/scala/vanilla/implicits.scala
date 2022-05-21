@@ -1,6 +1,8 @@
 package vanilla
 
-import vanilla.IO.{IO, Thunk}
+import vanilla.monad.IO.{IO, Thunk}
+import vanilla.monad.{IO, Monad}
+import vanilla.monoid.Monoid
 
 object implicits {
 
