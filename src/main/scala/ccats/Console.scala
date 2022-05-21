@@ -3,12 +3,7 @@ package ccats
 import cats.effect.{IO, IOApp}
 import cats.free.Free
 import cats.~>
-
-sealed trait Console[A]
-
-case object ReadLine extends Console[String]
-
-case class PrintLine(line: String) extends Console[Unit]
+import console.{Console, PrintLine, ReadLine}
 
 object Console {
   type Dsl[A] = Free[Console, A]

@@ -3,6 +3,7 @@ package playground
 import cats.{Id, Monad, Monoid}
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import console.{Console, PrintLine, ReadLine}
 import playground.FreeMonoid.{Combine, Identity}
 
 import scala.collection.mutable
@@ -39,12 +40,6 @@ object Free {
 trait ~>[F[_], G[_]] {
   def apply[A](fa: F[A]): G[A]
 }
-
-sealed trait Console[A]
-
-case object ReadLine extends Console[String]
-
-case class PrintLine(line: String) extends Console[Unit]
 
 object Console {
   // All operations like: getNumberOFCrashes, getNumberOfEmployees
@@ -86,7 +81,7 @@ object MonadExample extends App {
   val stack = mutable.Stack.empty[String]
   val list = ListBuffer.empty[String]
   val interpreterTest = interpreter2(stack, list)
-  program.foldMap(interpreter2(stack, list))
+  program.foldMap(interpreter).unsafeRunSync()
 
   println(stack)
   println(list)
