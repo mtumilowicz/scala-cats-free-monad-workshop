@@ -1,40 +1,35 @@
 package ccats
 
+import cats.effect.{IO, IOApp}
 import cats.free.Free
 import cats.~>
 
 sealed trait Console[A]
 
-case class ReadLine[A](value: String => A) extends Console[A]
+case object ReadLine extends Console[String]
 
-case class PrintLine[A](line: String, value: A) extends Console[A]
+case class PrintLine(line: String) extends Console[Unit]
 
 object Console {
   type Dsl[A] = Free[Console, A]
 
-  def readLine: Dsl[String] = Free.liftF(ReadLine(identity))
+  def readLine: Dsl[String] = Free.liftF(ReadLine)
 
-  def printLine(line: String): Dsl[Unit] = Free.liftF(PrintLine(line, ()))
+  def printLine(line: String): Dsl[Unit] = Free.liftF(PrintLine(line))
 }
 
-object IO {
-  type Thunk[A] = () => A
-  type IO[A] = Free[Thunk, A]
+object Test extends IOApp.Simple {
 
-  val identity = new (Thunk ~> Thunk) {
-    def apply[A](t: Thunk[A]): Thunk[A] = t
+  val interpreter: Console ~> IO = new (Console ~> IO) {
+    override def apply[A](fa: Console[A]): IO[A] = fa match {
+      case ReadLine => IO { scala.io.StdIn.readLine }
+      case PrintLine(line) => IO { println(line) }
+    }
   }
 
-  def apply[A](body: => A): IO[A] = Free.liftF(() => body)
-
-  def run[A](io: IO[A]): A = io.foldMap(identity).apply()
-
-}
-
-object IOApp extends App {
-  val program = for {
-    _ <- IO(println("helloo!!"))
+  val program: Free[Console, Unit] = for {
+    _ <- Console.printLine("helloo!!")
   } yield ()
 
-  IO.run(program)
+  val run = program.foldMap(interpreter)
 }
