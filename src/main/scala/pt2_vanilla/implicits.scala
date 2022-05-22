@@ -1,6 +1,6 @@
 package pt2_vanilla
 
-import pt2_vanilla.monad.IO.{IO, Thunk}
+import pt2_vanilla.monad.IO.{IO, Id, Thunk}
 import pt2_vanilla.monad.{IO, Monad}
 import pt2_vanilla.monoid.Monoid
 
@@ -16,6 +16,12 @@ object implicits {
     override def pure[A](x: A): IO[A] = IO(x)
 
     override def flatMap[A, B](fa: IO[A])(f: A => IO[B]): IO[B] = fa.flatMap(f)
+  }
+
+  implicit val monadId: Monad[Id] = new Monad[Id] {
+    override def pure[A](x: A): Id[A] = x
+
+    override def flatMap[A, B](fa: Id[A])(f: A => Id[B]): Id[B] = f(fa)
   }
 
   implicit val monoidString: Monoid[String] = new Monoid[String] {
