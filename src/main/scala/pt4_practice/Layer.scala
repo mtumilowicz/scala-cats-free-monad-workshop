@@ -2,9 +2,9 @@ package pt4_practice
 
 sealed trait Layer[+A] extends Product with Serializable { self =>
 
-  def fold[B](
-               ifValue: A => B
-             )(ifHorizontal: (B, B) => B)(ifVertical: (B, B) => B): B =
+  def fold[B](ifValue: A => B)
+             (ifHorizontal: (B, B) => B)
+             (ifVertical: (B, B) => B): B =
     self match {
       case Layer.Horizontal(left, right) =>
         ifHorizontal(

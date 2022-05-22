@@ -1,6 +1,11 @@
-package pt4_practice
+package pt5_practice
 
-object Examples {
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import pt4_practice._
+
+class GraphTest extends AnyFunSuite with Matchers {
+
   val layerCNode =
     Node(
       inputs = List(Type("A"), Type("B")),
@@ -39,14 +44,34 @@ object Examples {
       )
     )
 
-  def main(args: Array[String]): Unit = {
+  test("build graph") {
+    //    given
     val layer: Layer[Expr] = graph.build(List(Type("C")))
-    val expr = layer.fold[Expr](identity)(_ ++ _)(_ >>> _)
-    val used = layer.fold[List[Expr]](a => List(a))(_ ++ _)(_ ++ _)
-    val count = used.length
-    println(layer)
-    println(expr.string)
-    println(used)
-    println(count)
+
+    //    expect
+    layer.toString shouldBe "Vertical(Horizontal(Value(Expr(layerA)),Vertical(Value(Expr(layerD)),Value(Expr(layerB)))),Value(Expr(layerC)))"
   }
+
+  test("test expression") {
+    //    given
+    val layer: Layer[Expr] = graph.build(List(Type("C")))
+
+    //    when
+    val expr = layer.fold[Expr](identity)(_ ++ _)(_ >>> _)
+
+    //    then
+    expr.string shouldBe "((layerA ++ (layerD >>> layerB)) >>> layerC)"
+  }
+
+  test("used") {
+    //    given
+    val layer: Layer[Expr] = graph.build(List(Type("C")))
+
+    //    when
+    val used = layer.fold[List[Expr]](a => List(a))(_ ++ _)(_ ++ _)
+
+    //    then
+    used shouldBe List(Expr("layerA"), Expr("layerD"), Expr("layerB"), Expr("layerC"))
+  }
+
 }
