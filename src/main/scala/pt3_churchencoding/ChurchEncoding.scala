@@ -1,4 +1,4 @@
-package churchencoding
+package pt3_churchencoding
 
 object ChurchEncoding {
 

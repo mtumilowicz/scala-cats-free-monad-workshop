@@ -1,6 +1,6 @@
-package vanilla.monoid
+package pt2_vanilla.monoid
 
-import vanilla.implicits._
+import pt2_vanilla.implicits._
 
 object MonoidExample extends App {
   case class Person(name: String)

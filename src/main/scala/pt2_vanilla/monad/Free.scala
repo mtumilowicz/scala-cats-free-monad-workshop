@@ -1,7 +1,7 @@
-package vanilla.monad
+package pt2_vanilla.monad
 
-import vanilla.NaturalTransformation.~>
-import vanilla.monad.Free._
+import pt2_vanilla.NaturalTransformation.~>
+import pt2_vanilla.monad.Free._
 
 sealed trait Free[F[_], A] {
 

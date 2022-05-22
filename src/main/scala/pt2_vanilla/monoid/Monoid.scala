@@ -1,4 +1,4 @@
-package vanilla.monoid
+package pt2_vanilla.monoid
 
 trait Monoid[A] {
 

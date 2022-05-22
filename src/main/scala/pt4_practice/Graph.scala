@@ -1,4 +1,4 @@
-package example
+package pt4_practice
 
 final case class Graph[A](nodes: List[Node[A]]) {
   def findNode(output: Type): Node[A] =

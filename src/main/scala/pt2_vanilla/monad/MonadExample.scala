@@ -1,10 +1,10 @@
-package vanilla.monad
+package pt2_vanilla.monad
 
-import vanilla.Console
+import pt2_vanilla.Console
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import vanilla.implicits._
+import pt2_vanilla.implicits._
 
 object MonadExample extends App {
 

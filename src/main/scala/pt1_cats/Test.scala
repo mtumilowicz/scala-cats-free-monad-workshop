@@ -1,4 +1,4 @@
-package withcats
+package pt1_cats
 
 import cats.effect.{IO, IOApp}
 import cats.free.Free

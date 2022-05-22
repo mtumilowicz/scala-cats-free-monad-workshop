@@ -1,6 +1,6 @@
-package vanilla.monoid
+package pt2_vanilla.monoid
 
-import vanilla.monoid.FreeMonoid._
+import pt2_vanilla.monoid.FreeMonoid._
 
 sealed trait FreeMonoid[+A] { self =>
 

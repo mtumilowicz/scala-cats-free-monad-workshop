@@ -1,6 +1,6 @@
-package vanilla
+package pt2_vanilla
 
-import vanilla.monad.Free
+import pt2_vanilla.monad.Free
 
 sealed trait Console[A]
 

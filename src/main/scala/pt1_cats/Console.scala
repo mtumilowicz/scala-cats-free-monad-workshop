@@ -1,4 +1,4 @@
-package withcats
+package pt1_cats
 
 import cats.free.Free
 

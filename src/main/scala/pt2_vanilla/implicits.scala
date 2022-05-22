@@ -1,8 +1,8 @@
-package vanilla
+package pt2_vanilla
 
-import vanilla.monad.IO.{IO, Thunk}
-import vanilla.monad.{IO, Monad}
-import vanilla.monoid.Monoid
+import pt2_vanilla.monad.IO.{IO, Thunk}
+import pt2_vanilla.monad.{IO, Monad}
+import pt2_vanilla.monoid.Monoid
 
 object implicits {
 

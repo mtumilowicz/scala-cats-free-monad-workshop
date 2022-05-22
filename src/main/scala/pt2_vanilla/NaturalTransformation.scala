@@ -1,4 +1,4 @@
-package vanilla
+package pt2_vanilla
 
 trait NaturalTransformation[F[_], G[_]] {
 

@@ -1,4 +1,4 @@
-package vanilla.monad
+package pt2_vanilla.monad
 
 trait Monad[F[_]] {
   def pure[A](x: A): F[A]

@@ -1,4 +1,4 @@
-package example
+package pt4_practice
 
 final case class Expr(string: String) {
   def ++(that: Expr): Expr =
