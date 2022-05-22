@@ -44,7 +44,7 @@ class GraphTest extends AnyFunSuite with Matchers {
       )
     )
 
-  test("build graph") {
+  test("build graph (intermediary representation)") {
     //    given
     val layer: Layer[Expr] = graph.build(List(Type("C")))
 
@@ -52,7 +52,7 @@ class GraphTest extends AnyFunSuite with Matchers {
     layer.toString shouldBe "Vertical(Horizontal(Value(Expr(layerA)),Vertical(Value(Expr(layerD)),Value(Expr(layerB)))),Value(Expr(layerC)))"
   }
 
-  test("test expression") {
+  test("resolve graph") {
     //    given
     val layer: Layer[Expr] = graph.build(List(Type("C")))
 
@@ -63,7 +63,7 @@ class GraphTest extends AnyFunSuite with Matchers {
     expr.string shouldBe "((layerA ++ (layerD >>> layerB)) >>> layerC)"
   }
 
-  test("used") {
+  test("show only used layers") {
     //    given
     val layer: Layer[Expr] = graph.build(List(Type("C")))
 
