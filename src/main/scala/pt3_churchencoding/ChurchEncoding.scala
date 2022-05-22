@@ -43,6 +43,7 @@ object ChurchEncoding {
   sealed trait ChurchNaturalNumber { self =>
     def apply[A](ifZero: A)(ifSuccessor: A => A): A
 
+    def toInt: Int = apply(0)(_ + 1)
   }
 
   object ChurchNaturalNumber {
