@@ -15,5 +15,4 @@ object Console {
 
   def printLine(line: String): Dsl[Unit] = Free.liftF(PrintLine(line))
 
-
 }

@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 
 class AppTest extends AnyFunSuite with Matchers {
 
-  test("test1") {
+  test("test console app") {
     // given
     val inputs = mutable.Stack("Michal")
     val outputs = ListBuffer.empty[String]
