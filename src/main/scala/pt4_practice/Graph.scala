@@ -2,7 +2,10 @@ package pt4_practice
 
 final case class Graph[A](nodes: List[Node[A]]) {
   def findNode(output: Type): Node[A] =
-    nodes.find(_.outputs.contains(output)).get
+    nodes.find(_.outputs.contains(output)) match {
+      case Some(value) => value
+      case None => throw new Error(s"Compilation error: missing $output layer") // simulates that error you get with ZIO2
+    }
 
   def build(target: List[Type]): Layer[A] = {
     val result: List[Layer[A]] = target.map { t =>
