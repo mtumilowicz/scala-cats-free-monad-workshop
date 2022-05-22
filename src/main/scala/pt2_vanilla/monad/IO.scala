@@ -1,6 +1,5 @@
 package pt2_vanilla.monad
 
-import cats.Id
 import pt2_vanilla.NaturalTransformation.~>
 import pt2_vanilla.{Console, PrintLine, ReadLine}
 import pt2_vanilla.implicits._
@@ -11,6 +10,7 @@ import scala.collection.mutable.ListBuffer
 object IO {
   type Thunk[A] = () => A
   type IO[A] = Free[Thunk, A]
+  type Id[A] = A
 
   val identity = new (Thunk ~> Thunk) {
     def apply[A](t: Thunk[A]): Thunk[A] = t
