@@ -3,22 +3,21 @@ package pt1_cats
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
-
 class AppTest extends AnyFunSuite with Matchers {
 
   test("test console app") {
     // given
-    val inputs = mutable.Stack("Michal")
-    val outputs = ListBuffer.empty[String]
+    val files = Map("test.txt" -> "Igor".getBytes)
 
     // when
-    App.program.foldMap(Config.inMemoryInterpreter(inputs, outputs))
+    val (state, result) = App.program
+      .foldMap(Config.inMemoryInterpreter)
+      .run(files)
+      .value
 
     // then
-    inputs shouldBe empty
-    outputs shouldBe ListBuffer("What is your name?", "Hi Michal!")
+    state shouldBe Map("test.txt" -> "Igor".getBytes, "log.txt" -> "Hello Igor!".getBytes)
+    result shouldBe "Hello Igor!"
   }
 
 }

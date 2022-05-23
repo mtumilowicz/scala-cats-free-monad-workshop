@@ -1,29 +1,48 @@
 package pt1_cats
 
+import cats.arrow.FunctionK
+import cats.data.State
 import cats.effect.IO
-import cats.{Id, ~>}
+import cats.{Eval, Id, ~>}
 
+import java.nio.file.{Files, Paths}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.io.Source
+import scala.util.Using
 
 object Config {
 
-  val ioInterpreter : Console ~> IO = new (Console ~> IO) {
-    override def apply[A](fa: Console[A]): IO[A] = fa match {
-      case ReadLine => IO { scala.io.StdIn.readLine }
-      case PrintLine(line) => IO { println(line) }
+  val ioInterpreter = new (Disk ~> IO) {
+    override def apply[A](fa: Disk[A]): IO[A] = {
+      fa match {
+        case Read(filename) =>
+          IO {
+            Using(Source.fromFile(filename, "UTF-8")) {
+              _.mkString.getBytes
+            }.getOrElse(Array[Byte]())
+          }
+        case Write(filename, data) =>
+          IO {
+            Files.write(Paths.get(filename), data)
+            ()
+          }
+      }
     }
   }
 
-  def inMemoryInterpreter(input: mutable.Stack[String], output: ListBuffer[String]): Console ~> Id = new (Console ~> Id) {
+  type InMemoryState[A] = State[Map[String, Array[Byte]], A]
 
-    def apply[A](inout: Console[A]): Id[A] = inout match {
-      case PrintLine(line) =>
-        output += line
-        ()
-      case ReadLine =>
-        input.pop
-    }
+  val inMemoryInterpreter = new (Disk ~> InMemoryState) {
+    override def apply[A](fa: Disk[A]): InMemoryState[A] =
+      fa match {
+        case Read(filename) =>
+          State[Map[String, Array[Byte]], Array[Byte]](map =>
+            (map, map(filename)))
+        case Write(filename, data) =>
+          State[Map[String, Array[Byte]], Unit](map =>
+            (map.updated(filename, data), ()))
+      }
   }
 
 }

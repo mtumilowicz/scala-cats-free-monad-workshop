@@ -17,8 +17,51 @@
     * http://jim-mcbeath.blogspot.com/2008/11/practical-church-numerals-in-scala.html
     * https://softwaremill.com/free-tagless-compared-how-not-to-commit-to-monad-too-early/
     * https://softwaremill.com/free-monads/
+    * https://gist.github.com/igor-ramazanov/bd7d2a9dd5726d8ca9c356cf6cd85abf
 
 ## free monad
+* example
+    ```
+    sealed trait DiskIO[A]
+    final case class Read(file: String) extends DiskIO[Array[Byte]]
+    final case class Write(file: String, contents: Array[Byte]) extends DiskIO[Unit]
+
+    object DiskIO {
+      def read(filename: String): Free[Disk, Array[Byte]] = Free.lift(Read(filename))
+      def write(filename: String, data: Array[Byte]) = Free.lift(Write(filename, data))
+    }
+
+    def program: Free[DiskIO, Unit] = for {
+        foo <- DiskIO.read("foo.txt")
+        bar <- DiskIO.read("bar.txt")
+        _ <- DiskIO.write("output.txt", foo ++ bar)
+      } yield ()
+
+    val interpreterTask: DiskIO ~> Task = new (DiskIO ~> Task) {
+      def apply[A](fa: DiskIO[A]): Task[A] = fa match {
+        case Read(file) => Task { ... }
+        case Write(file, contents) => Task { ... }
+      }
+    }
+
+    foo2.foldMap(interpreterTask)
+    ```
+* free monad = represent program as data
+    * `Free[F, A]`
+      * Free = program
+      * F - algebra of the program (language)
+      * A - value produced by the program
+* allows us to separate the structure of the computation from its interpreter, thereby allowing
+different interpretation depending on context
+* description of a program
+    * set of things you can do is algebra of a free monad program
+    * you can go through cases one by one and, and say: program can this
+    * easier to transform, compose, reason about
+* using the free monad:
+    * programs are data; built from constructors of an ADT
+    * each operation is reified as a value
+    * we can pattern-match on the programs (which are values) to transform & optimize them
+    * interpretation is deferred until an interpreter is provided
 * trouble with monads
   * sequential computation: a program can depend on a value produced by previous program
   * trait Monad[F[_]]
@@ -33,43 +76,6 @@
     * no program depends on any runtime value: structure is static
     * (doX |@| doY |@| doZ)(doResults(_, _, _))
       * parallel, not sequential
-* free monad = represent program as data
-* tagless vs free
-* allows us to separate the structure of the computation from its interpreter, thereby allowing different interpretation depending on context
-* using the free monad:
-    * programs are data; built from constructors of an ADT
-    * each operation is reified as a value
-    * we can pattern-match on the programs (which are values) to transform & optimize them
-    * interpretation is deferred until an interpreter for the basic instructions is provided
-    * interpretation is stack-safe
-* description of a program
-  * set of things you can do is algebra of a free monad program
-    * you can go through cases one by one and, and say: program can this
-  * if you use Task or IO you don't know anything: Task[Unit] can do anything in the world
-* easier to transform, compose, reason about
-* Free[F, A]
-  * Free = program
-  * F - algebra of the program (language)
-  * A - value produced by the program
-* example (sql)
-    ```
-    * sealed trait DiskIO[A]
-    * object DiskIO
-      * final case class Read(file: String) extends DiskIO[Array[Byte]]
-      * final case class Write(file: String, contents: Array[Byte]) extends DiskIO[Unit]
-      * final case class Delete(file: String) extends DiskIO[Boolean]
-    * def foo1: Free[DiskIO, Unit] = for
-      * foo <- Free.lift(DiskIO.read("foo.txt")
-      * bar <- Free.lift(DiskIO.read("bar.txt")
-      * _ <- Free.lift(DiskIO.write("output.txt", foo ++ bar))
-      * yield ()
-    * val interpreter: DiskIO ~> Task = new (DiskIO ~> Task) { // other interpreter for testing purposes
-      * def apply[A](fa: DiskIO[A]): Task[A] = fa match {
-        * case Read(file) => Task { ... }
-        * case Write(file, contents) => Task { ... }
-        * case Delete(file) => Task { ... }
-      * foo2.foldMap(interpreter)
-    ```
 
 ## free applicatives
   * record the structure of applicative composition
