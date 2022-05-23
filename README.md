@@ -8,15 +8,77 @@
     * [Free as in Monads by Daniel Spiewak](https://www.youtube.com/watch?v=aKUQUIHRGec)
     * [Free monad or tagless final? How not to commit to a monad too early - Adam Warski](https://www.youtube.com/watch?v=IhVdU4Xiz2U)
     * [Free Monads—Paweł Szulc](https://www.youtube.com/watch?v=ycrpJrcWMp4)
+    * [Uniting Church and State: FP and OO Together by Noel Welsh](https://www.youtube.com/watch?v=IO5MD62dQbI)
     * https://softwaremill.com/free-tagless-compared-how-not-to-commit-to-monad-too-early/
     * https://github.com/softwaremill/free-tagless-compare
     * https://github.com/zivergetech/Zymposium
+    * https://github.com/noelwelsh/church-and-state
+    * https://underscore.io/blog/posts/2017/06/02/uniting-church-and-state.html
+    * http://jim-mcbeath.blogspot.com/2008/11/practical-church-numerals-in-scala.html
 
 ## free monad
 
 ## free monoid
 
 ## church encoding
+* OO vs FP
+    * OO: easy to add operations, hard to add actions (ex. return type change)
+        ```
+        class Calculator {
+            def literal(v: Double): Double = v
+            def add(a: Double, b: Double): Double = a + b
+            def subtract(a: Double, b: Double): Double = a - b
+            ...
+        }
+
+        val c = new Calculator
+        import c._
+
+        add(literal(1.0), subtract(literal(3.0), literal(2.0)))
+
+        // inheritance (add operations)
+        class TrigonometricCalculator extends Calculator {
+            def sin(a: Double): Double = Math.sin(a)
+        }
+        ```
+    * FP: hard to add operations, easy to add actions (ex. new interpreter)
+        ```
+        // classic FP = represent operations as data
+        sealed trait Calculation
+        case class Literal(v: Double) extends Calculation
+        case class Add(a: Calculation, b: Calculation) extends Calculation
+        case class Subtract(a: Calculation, b: Calculation) extends Calculation
+        ...
+
+        // define interpreters (add actions)
+        def eval(c: Calculation): Double =
+            c match {
+                case Literal(v) => v
+                case Add(a, b) => eval(a) + eval(b)
+                case Subtract(a, b) => eval(a) - eval(b)
+                ...
+            }
+
+        def pretty(c: Calculation): String =
+            c match {
+                case Literal(v) => v.toString
+                case Add(a, b) => s"${pretty(a)} + ${pretty(b)}"
+                case Subtract(a, b) => s"${pretty(a)} - ${pretty(b)}"
+                ...
+            }
+        ```
+        *  it’s impossible to add new operations, like sin and cos, to this representation without code changes
+
+* OO and FP are related bu the Church encoding
+* takes us from FP to OO
+    * constructors become method calls
+    * operator types because action types
+* reification: takes from OO to FP
+* type classes are Church encodings of free structures
+* free structures are reifications of type classes
+* in scala, according to "Towards Equal Rights for Higher-Kinded Types" by Moors, Piessens and Odersky, July 2007
+    * Scala's kinds correspond to the types of the simply-typed lambda calculus. This means that we can express addition on natural numbers on the level of types using a Church Encoding.
+    * example: https://w.pitula.me/2017/typelevel-church-enc/
 
 ## zio layer context
 
