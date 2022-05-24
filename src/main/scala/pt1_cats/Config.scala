@@ -1,13 +1,10 @@
 package pt1_cats
 
-import cats.arrow.FunctionK
 import cats.data.State
 import cats.effect.IO
-import cats.{Eval, Id, ~>}
+import cats.~>
 
 import java.nio.file.{Files, Paths}
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.util.Using
 

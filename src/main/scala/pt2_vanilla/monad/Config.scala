@@ -1,7 +1,7 @@
 package pt2_vanilla.monad
 
-import pt2_vanilla._
 import pt2_vanilla.NaturalTransformation.~>
+import pt2_vanilla._
 import pt2_vanilla.monad.IO._
 
 import scala.collection.mutable

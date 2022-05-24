@@ -2,8 +2,8 @@ package pt2_vanilla
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-import pt2_vanilla.monad.{App, Config}
 import pt2_vanilla.implicits._
+import pt2_vanilla.monad.{App, Config}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
