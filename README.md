@@ -62,17 +62,17 @@
     ```
 * free monad = represent program as data
     * `Free[F, A]`
-      * Free = program
-      * F - algebra of the program (language)
-        * you can go through cases one by one and, and say: program can this
-        * easier to transform, compose, reason about
-      * A - value produced by the program
+        * Free = program
+        * F - algebra of the program (language)
+            * you can go through cases one by one and, and say: program can this
+            * easier to transform, compose, reason about
+        * A - value produced by the program
 * allows us to separate the structure of the computation from its interpreter
     * different interpretation depending on context (live vs tests)
 * pros
     * we can pattern-match on the programs (which are values) to transform & optimize them
     * interpretation is deferred until an interpreter is provided
-* trouble with monads
+* digression: trouble with monads
     * `def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]`
         * sequential computation: a program can depend on a value produced by previous program
         * fa - first program
@@ -80,33 +80,44 @@
         * F[B] - second program
         * return = result program
         * can only be interpreted, not introspected and transformed prior to interpretation
-    * `def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]` // applicatives
+    * however applicatives: `def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]`
         * no program depends on any runtime value: structure is static
-        * (doX |@| doY |@| doZ)(doResults(_, _, _))
+        * `(doX, doY, doZ) mapN (doResults(_, _, _))`
             * parallel, not sequential
+    * back to monads
         * can I represent the `ap` function in terms of the `bind` function?
             * yes - every monad is an applicative
-            * `Applicative[List].map2(List(1, 2, 3), List(1, 2, 3))( _ + _)`
-                * List(2, 4, 6)
-                * List(2, 3, 4, 3, 4, 5, 4, 5, 6)
-                * you could implement an Applicative instance for List whose map2 method works as you want
-                *  If you only consider Applicative then both implementations are valid. However, in the moment we realize List could (should?) also have an instance of Monad, and taking into account that all Monads are also Applicatives (in cats modeled as trait Monad[F[_]] extends Applicative[F], well not really but whatever) then the implementation of map2 in this case has not only to be consistent with the Applicative laws but also with the Monad laws
-                * this because map2 is implemented in terms of ap which in this case is implemented in terms of flatMap
-                * As such, only the current implementation is valid
-                * This is called typeclass coherence.
-                * And this is the reason why things like Valided exists which only has Applicative instances but not Monad ones, like Either.
-                * This is also the reason of why you should (must?) only implement the most concrete typeclass possible for each type, and leave subtyping to handle the most abstract ones.
         * can I represent parallel execution with monads
-            * maybe, but unlikely - not every applicative is a monad
-                * a type which exposes a monadic interface cannot use Applicative to do parallel computation
-            * representation of parallel execution (which you haven't posted unfortunately) may fulfill the
-            applicative laws, but the monad laws might not hold for it
+            * a type which exposes a monadic interface cannot use Applicative to do parallel computation
             * the Monad and Applicative operations should relate as follows:
-              pure = return
-              (<*>) = ap
-              * (<*>) = ap is exactly the same as saying m1 <*> m2 = do { x1 <- m1; x2 <- m2; return (x1 x2) }
-            * (<*>) :: f (a -> b) -> f a -> f b
-            * ap :: Monad m => m (a -> b) -> m a -> m b
+                * `(<*>) = ap`, where
+                    * `(<*>) :: f (a -> b) -> f a -> f b`
+                    * `ap :: Monad m => m (a -> b) -> m a -> m b`
+                * `(<*>) = ap` is exactly the same as
+                    ```
+                    m1 <*> m2 = do {
+                        x1 <- m1;
+                        x2 <- m2;
+                        return (x1 x2)
+                    }
+                    ```
+            * example for List
+                * `Applicative[List].map2(List(1, 2, 3), List(1, 2, 3))( _ + _)`
+                * two possible returns
+                    * `List(2, 4, 6)`
+                    * `List(2, 3, 4, 3, 4, 5, 4, 5, 6)`
+                * explanation
+                    * if you only consider Applicative then both implementations are valid
+                    * however
+                        * List should have also an instance of Monad
+                        * all Monads are also Applicatives (in cats: `Monad[F[_]] extends Applicative[F]`)
+                        * then the implementation of `map2` in this case has not only to be consistent with
+                        the Applicative laws but also with the Monad laws
+                            * map2 is implemented in terms of `ap` which is implemented in terms of `flatMap`
+                        * as such, only the current implementation is valid
+                            * this is called typeclass coherence
+                    * this is the reason why things like `Valided` has only `Applicative` instances but not
+                    `Monad` ones, like `Either`
 * intuition for free functor hierarchy
   * free functor: programs that change values
   * free applicatives: programs that build data
