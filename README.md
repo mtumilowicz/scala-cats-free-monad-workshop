@@ -23,6 +23,7 @@
     * https://hackage.haskell.org/package/base-4.16.1.0/docs/Control-Applicative.html
     * https://stackoverflow.com/questions/46913472/how-exactly-does-the-ap-applicative-monad-law-relate-the-two-classes
     * https://www.reddit.com/r/scala/comments/hu1xgk/struggling_with_cats_applicative_implementation/
+    * https://stackoverflow.com/questions/54164346/what-is-the-main-difference-between-free-monoid-and-monoid
 
 ## free monad
 * example
@@ -102,7 +103,7 @@
                     }
                     ```
             * example for List
-                * `Applicative[List].map2(List(1, 2, 3), List(1, 2, 3))( _ + _)`
+                * `Applicative[List].map2(List(1, 2, 3), List(1, 2, 3))(_ + _)`
                 * two possible returns
                     * `List(2, 4, 6)`
                     * `List(2, 3, 4, 3, 4, 5, 4, 5, 6)`
@@ -116,49 +117,31 @@
                             * map2 is implemented in terms of `ap` which is implemented in terms of `flatMap`
                         * as such, only the current implementation is valid
                             * this is called typeclass coherence
-                    * this is the reason why things like `Valided` has only `Applicative` instances but not
-                    `Monad` ones, like `Either`
+                    * this is the reason why things like Valided has only Applicative instances but not
+                    Monad ones, like Either
 * intuition for free functor hierarchy
-  * free functor: programs that change values
-  * free applicatives: programs that build data
-    * classic example: parsers
-        ```
-        case class AuthConfig(port: Int, host: String)
-        val authConfig = (int("port"), server("host")) mapN (AuthConfig)
-        ```
-  * free monads: programs that build programs
+    * free functor: programs that change values
+    * free applicatives: programs that build data
+        * classic example: parsers
+            ```
+            case class AuthConfig(port: Int, host: String)
+            val authConfig = (int("port"), server("host")) mapN (AuthConfig)
+            ```
+    * free monads: programs that build programs
 
 ## free monoid
-* monoid laws
-  * combine(identity, a) == a
-  * combine(a, identity) == a
-  * associativity
-* free monoid
-  * sealed trait FreeMonoid[+A]
-  * object FreeMonoid
-    * case object Identity extend FreeMonoid[Nothing]
-    * case class Combine[A](a1: FreeMonoid[A], a2: FreeMonoid[A]) extend FreeMonoid[A]
-    * case class Value[A](value: A) extends FreeMonoid[A]
-    * foldMap[Z](ifValue: A => Z)(implicit monoid: Monoid[Z]): Z = ...
-    * def ++(that: FreeMonoid[A]): FreeMonoid[A] = Combine(self, that)
-  * use case: first build a tree, then analyze it, then do optimizations, then combine it
-    * val free = FreeMonoid.Value(kit) ++ FreeMonoid.Value(adam)
-      * println(free) // Combine(Combine(Value(kit), Value(adam)), ...)
-  * it is not associative (tree) - but you could always combine it to be associative
-    * (FreeMonoid.Value(kit) ++ FreeMonoid.Value(adam)) ++ FreeMonoid.Value(joe)
-    * FreeMonoid.Value(kit) ++ (FreeMonoid.Value(adam) ++ FreeMonoid.Value(joe))
-    * but when running foldMap it does not matter
-  * similar to list
-      * case class Combine[A](a1: A, a2: FreeMonoid[A]) extend FreeMonoid[A]
-      * ++ pattern match Identity => that; Combine(a1, a2) => Combine(a1, a2 + that)
-      * def value[A](value: A): FreeMonoid[A] = Combine(value, Identity)
-      * if we change it like this the structure is associative (we are combine it like a list)
-      * a1 = head; a2 = tail; Identity - Nil, Combine - Cons
-
+* when more than one monoid exists for a type, the free monoid defers
+the decision on which specific monoid to use
+* example
+    * for integers, infinitely many monoids exist, but the most common are addition and multiplication
+    * val out = FreeMonoid.Value(2) ++ FreeMonoid.Value(3) ++ ...
+    * println(out) // Combine(Combine(Value(2), Value(3)), ...)
+* similar to list
+    * you could store elements in the list, then fold them with monoid
 
 ## church encoding
 * OO vs FP
-    * OO: easy to add operations, hard to add actions (ex. return type change)
+    * OO: easy to add operations (without code changes), hard to add actions (ex. return type change)
         ```
         class Calculator {
             def literal(v: Double): Double = v
@@ -204,16 +187,16 @@
             }
         ```
         *  it’s impossible to add new operations, like sin and cos, to this representation without code changes
-
 * OO and FP are related bu the Church encoding
-* takes us from FP to OO
-    * constructors become method calls
-    * operator types because action types
-* reification: takes from OO to FP
+    * takes us from FP to OO
+        * constructors become method calls
+        * operator types because action types
+    * reification: takes from OO to FP
 * type classes are Church encodings of free structures
 * free structures are reifications of type classes
 * in scala, according to "Towards Equal Rights for Higher-Kinded Types" by Moors, Piessens and Odersky, July 2007
-    * Scala's kinds correspond to the types of the simply-typed lambda calculus. This means that we can express addition on natural numbers on the level of types using a Church Encoding.
+    * Scala's kinds correspond to the types of the simply-typed lambda calculus
+    * this means that we can express addition on natural numbers on the level of types using a Church Encoding
     * example: https://w.pitula.me/2017/typelevel-church-enc/
 
 ## zio layer context
