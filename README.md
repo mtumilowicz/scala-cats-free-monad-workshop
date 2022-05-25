@@ -200,3 +200,26 @@ the decision on which specific monoid to use
     * example: https://w.pitula.me/2017/typelevel-church-enc/
 
 ## zio layer context
+* suppose that we have two time consuming computations
+    * A ===================> C
+    * A ===================> C'
+* and suppose there is some other orchestration that is trivial
+    * B ==> C
+    * B ==> C'
+* and there is often shorter path to some type B
+    * A ===========> B
+* so we can go:
+    * A ===========> B
+    * and then
+        * B ==> C and B ==> C'
+* and therefore save a lot of time
+    * ===================>===================>
+    * ===========>==>==>
+* it could be difficult to see what is that intermediary structure B
+    * replace functions call with data representation (B) and then fold over it (C, C')
+    * reverse process to church encoding
+* suppose we would like to have a program that:
+    * shows how to correctly compose zio layers
+    * and prints all layers that are used to create other layers
+    * so it's better to create first representation of graph, then - evaluate it
+        * otherwise we would have to use big parts of the same logic twice (generating graph twice)
