@@ -65,11 +65,11 @@
     * `Free[F, A]`
         * Free = program
         * F - algebra of the program (language)
-            * you can go through cases one by one and, and say: program can this
+            * you can go through cases one by one and say: program can this or that
             * easier to transform, compose, reason about
         * A - value produced by the program
-* allows us to separate the structure of the computation from its interpreter
-    * different interpretation depending on context (live vs tests)
+* allows us to separate the structure of the computation from its interpretation
+    * different interpretation depending on context (ex. live vs tests)
 * pros
     * we can pattern-match on the programs (which are values) to transform & optimize them
     * interpretation is deferred until an interpreter is provided
@@ -80,8 +80,8 @@
         * A - runtime value
         * F[B] - second program
         * return = result program
-        * can only be interpreted, not introspected and transformed prior to interpretation
-    * however applicatives: `def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]`
+        * can only be interpreted, not introspected and transformed (prior to interpretation)
+    * however, in applicatives: `def ap[A, B](ff: F[A => B])(fa: F[A]): F[B]`
         * no program depends on any runtime value: structure is static
         * `(doX, doY, doZ) mapN (doResults(_, _, _))`
             * parallel, not sequential
@@ -92,7 +92,7 @@
             * a type which exposes a monadic interface cannot use Applicative to do parallel computation
             * the Monad and Applicative operations should relate as follows:
                 * `(<*>) = ap`, where
-                    * `(<*>) :: f (a -> b) -> f a -> f b`
+                    * `(<*>) :: f (a -> b) -> f a -> f b` // from applicative
                     * `ap :: Monad m => m (a -> b) -> m a -> m b`
                 * `(<*>) = ap` is exactly the same as
                     ```
@@ -114,11 +114,11 @@
                         * all Monads are also Applicatives (in cats: `Monad[F[_]] extends Applicative[F]`)
                         * then the implementation of `map2` in this case has not only to be consistent with
                         the Applicative laws but also with the Monad laws
-                            * map2 is implemented in terms of `ap` which is implemented in terms of `flatMap`
-                        * as such, only the current implementation is valid
+                            * `map2` is implemented in terms of `ap` which is implemented in terms of `flatMap`
+                        * as such, only the second implementation is valid
                             * this is called typeclass coherence
-                    * this is the reason why things like Valided has only Applicative instances but not
-                    Monad ones, like Either
+                    * reason why things like Valided has only Applicative instances but not Monad ones (contrary to
+                    for example Either)
 * intuition for free functor hierarchy
     * free functor: programs that change values
     * free applicatives: programs that build data
@@ -186,11 +186,33 @@ the decision on which specific monoid to use
                 ...
             }
         ```
-        *  it’s impossible to add new operations, like sin and cos, to this representation without code changes
-* OO and FP are related bu the Church encoding
+* OO and FP are related by the Church encoding
     * takes us from FP to OO
         * constructors become method calls
-        * operator types because action types
+        * operator types become action types
+        * example
+            ```
+            trait ChurchBoolean {
+              def apply[A](ifTrue: => A, ifFalse: => A): A
+
+              def &&(that: ChurchBoolean): ChurchBoolean =
+                this(
+                  that,
+                  ChurchBoolean.False
+                )
+            }
+
+            object ChurchBoolean {
+              val True = new ChurchBoolean {
+                override def apply[A](ifTrue: => A, ifFalse: => A): A = ifTrue
+              }
+
+              val False = new ChurchBoolean {
+                override def apply[A](ifTrue: => A, ifFalse: => A): A = ifFalse
+              }
+
+            }
+            ```
     * reification: takes from OO to FP
 * type classes are Church encodings of free structures
 * free structures are reifications of type classes
@@ -206,7 +228,7 @@ the decision on which specific monoid to use
 * and suppose there is some other orchestration that is trivial
     * B ==> C
     * B ==> C'
-* and there is often shorter path to some type B
+* there is often shorter path to some type B
     * A ===========> B
 * so we can go:
     * A ===========> B
@@ -219,7 +241,7 @@ the decision on which specific monoid to use
     * replace functions call with data representation (B) and then fold over it (C, C')
     * reverse process to church encoding
 * suppose we would like to have a program that:
-    * shows how to correctly compose zio layers
-    * and prints all layers that are used to create other layers
+    * shows how to correctly compose zio layers based on set of given layers
+    * and prints all layers that are missing
     * so it's better to create first representation of graph, then - evaluate it
-        * otherwise we would have to use big parts of the same logic twice (generating graph twice)
+        * otherwise we would have to reuse big parts of the same logic twice (generating graph twice)
