@@ -28,6 +28,14 @@
     * https://www.reddit.com/r/scala/comments/hu1xgk/struggling_with_cats_applicative_implementation/
     * https://stackoverflow.com/questions/54164346/what-is-the-main-difference-between-free-monoid-and-monoid
 
+## preface
+* goals of this workshop:
+    * show free monads as a opposition to tagless-final
+    * introduction to other free structures: monoid, applicative, functor
+    * introduction to church encoding and reification
+    * understand how to use reification and free structures in practice
+    * show how resolve layers graph with reification and free structures
+
 ## free monad
 * example
     ```
