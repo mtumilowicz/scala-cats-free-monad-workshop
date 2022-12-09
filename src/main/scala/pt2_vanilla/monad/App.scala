@@ -12,6 +12,6 @@ object App {
   } yield ()
 
   def main(args: Array[String]): Unit = {
-    IO.run(program.foldMap(IO.ioInterpreter))
+    IO.run(program.foldMap(Config.ioInterpreter))
   }
 }

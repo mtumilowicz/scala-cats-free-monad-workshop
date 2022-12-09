@@ -1,4 +1,4 @@
-package pt5_practice
+package pt4_practice
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
