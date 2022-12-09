@@ -7,7 +7,8 @@ object App extends IOApp {
 
   def program(implicit I: ConsoleReaders[CatsApp], D: ConsolePrinters[CatsApp]): Free[CatsApp, Unit] = {
 
-    import I._, D._
+    import D._
+    import I._
 
     for {
       _ <- printLine("What is your name?")

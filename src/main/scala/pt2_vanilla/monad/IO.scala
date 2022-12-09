@@ -2,10 +2,6 @@ package pt2_vanilla.monad
 
 import pt2_vanilla.NaturalTransformation.~>
 import pt2_vanilla.implicits._
-import pt2_vanilla.{Console, PrintLine, ReadLine}
-
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 object IO {
   type Thunk[A] = () => A

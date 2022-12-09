@@ -2,7 +2,6 @@ package pt4_practice
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-import pt4_practice._
 
 class GraphTest extends AnyFunSuite with Matchers {
 
