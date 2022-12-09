@@ -27,6 +27,7 @@
     * https://stackoverflow.com/questions/46913472/how-exactly-does-the-ap-applicative-monad-law-relate-the-two-classes
     * https://www.reddit.com/r/scala/comments/hu1xgk/struggling_with_cats_applicative_implementation/
     * https://stackoverflow.com/questions/54164346/what-is-the-main-difference-between-free-monoid-and-monoid
+    * https://typelevel.org/cats/datatypes/freemonad.html#composing-free-monads-adts
 
 ## preface
 * goals of this workshop:
@@ -128,7 +129,7 @@
                             * `map2` is implemented in terms of `ap` which is implemented in terms of `flatMap`
                         * as such, only the second implementation is valid
                             * this is called typeclass coherence
-                    * reason why things like Valided has only Applicative instances but not Monad ones (contrary to
+                    * reason why things like Validated has only Applicative instances but not Monad ones (contrary to
                     for example Either)
 * intuition for free functor hierarchy
     * free functor: programs that change values
@@ -139,6 +140,13 @@
             val authConfig = (int("port"), server("host")) mapN (AuthConfig)
             ```
     * free monads: programs that build programs
+
+## composing free monads
+* `EitherK[F[_], G[_], A]` - either on type constructors
+* `InjectK[F[_], G[_]]` is a type class providing an injection from type constructor `F` into type constructor `G`
+* we do injection from
+    * `FreeMonad1 -> EitherK[FreeMonad1, FreeMonad2, A]` and `FreeMonad2 -> EitherK[FreeMonad1, FreeMonad2, A]`
+* and we can operate on `Free[EitherK[FreeMonad1, FreeMonad2], A]`
 
 ## free monoid
 * when more than one monoid exists for a type, the free monoid defers
