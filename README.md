@@ -143,10 +143,12 @@
 
 ## composing free monads
 * `EitherK[F[_], G[_], A]` - either on type constructors
-* `InjectK[F[_], G[_]]` is a type class providing an injection from type constructor `F` into type constructor `G`
-* we do injection from
-    * `FreeMonad1 -> EitherK[FreeMonad1, FreeMonad2, A]` and `FreeMonad2 -> EitherK[FreeMonad1, FreeMonad2, A]`
-* and we can operate on `Free[EitherK[FreeMonad1, FreeMonad2], A]`
+* `FunctionK[F[_], G[_]]` is a natural transformation from `F` to `G`
+    * we can compose them: `interpreter1 or interpreter2` (`FunctionK[EitherK[...], ...]`)
+    * last problem: `type Dsl[A] = Free[F, A]` should have the same type `F`
+        * `InjectK[F[_], G[_]]` is a type class providing an injection from type constructor `F` into type constructor `G`
+        * we have to lift our DSLs into that common `F`
+            * 
 
 ## free monoid
 * when more than one monoid exists for a type, the free monoid defers
